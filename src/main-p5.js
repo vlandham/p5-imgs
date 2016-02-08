@@ -1,77 +1,80 @@
 
-// all strings loaded
-var data;
-
-// current data being displayed
-var viewData = [];
+var img;
 
 // Preload function is used to load data and nothing else
 function preload() {
-  // load strings as an array and save to data
-  data = loadStrings('data/alice.txt');
+  img = loadImage("img/hedge.jpg")
 }
 
 // Initial setup of sketch
 function setup() {
 
-  createCanvas(windowWidth, windowHeight);
-  background('steelblue');
+  createCanvas(img.width, img.height);
+  background('#fff');
 
   textSize(32);
   fill('white');
 
+  image(img, 0, 0);
 
-  // sort the lines just for fun
-  data.sort(function(a,b) { return a.length - b.length; });
-  console.log(data);
+  filter(GRAY);
+  filter(THRESHOLD);
 
-  // starter data to be displayed.
-  for(var i = 0; i < 10; i++) {
-    addView();
-  }
-}
+  var d = pixelDensity();
+  var halfImage = 4 * (width * d) * (height / 2 * d);
 
-// Draw function
-function draw() {
-  clear();
-  background('steelblue');
+  loadPixels();
 
-  // modify the lines being displayed
-  updateView();
-  // for each line to display
-  viewData.forEach(function(d) {
-    // display text
-    text(data[d.index], d.x, d.y);
-    // move text down by 1
-    d.y = d.y + 1;
-  });
-}
+  var x;
+  var y;
+  var count = 0;
 
-// add a new random line to be displayed.
-function addView() {
-  viewData.push({x: random(10, width - 10), y: random(10, height - 10), index: Math.floor(random(0, data.length))});
-}
+  var points = []
 
-// if a line has moved off the screen,
-// add two more randomly in its place.
-function updateView() {
-  var len = viewData.length;
-  var remove = []
+  for(y = 0; y < height; y++) {
+    for(x = 0; x < width; x++) {
+      // count += 1;
+      idx = 4 * ((y * d ) * width * d + (x * d ));
 
-  viewData.forEach(function(d,i) {
-    if(d.y > height) {
-      remove.push(i);
+      if(pixels[idx] < 40) {
+
+        points.push([x,y])
+
+        pixels[idx] = 100
+        pixels[idx + 1] = 200
+        pixels[idx + 2] = 200
+        count += 1;
+      }
+
     }
-  });
+  }
 
-  remove.forEach(function(r){
-    viewData.splice(r,1);
-    addView();
-    addView();
-  });
+  console.log(points.length)
+
+  // points.forEach(function(point1) {
+    // points.forEach(function(point2) {
+    //
+    // })
+  // })
+
+
+  // for (var i = 0; i < halfImage; i++) {
+  //   pixels[i+halfImage] = pixels[i];
+  // }
+
+  updatePixels();
+
+
 }
+
+// // Draw function
+// function draw() {
+//   clear();
+//   background('#ddd');
+//
+// }
 
 // resize canvas if window resizes.
 function windowResized() {
-  resizeCanvas(windowWidth, windowHeight);
+  // resizeCanvas(windowWidth, windowHeight);
 }
